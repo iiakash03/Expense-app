@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 sequelize
-.sync({force:true})
+.sync()
 .then(result=>{
     app.listen(3000);
 })
