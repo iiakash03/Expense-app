@@ -7,9 +7,38 @@
     <title>Document</title>
 </head>
 <body>
-    <form>
-        <
+    <form onsubmit="register()" method="post">
+        <label>Name</label>
+        <input type="text" name="fname">
+        <label>Email</label>
+        <input type="email" name="femail">
+        <label>Password</label>
+        <input type="password" name="fpassword">
+        <input type="submit">
     </form>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+
+    <script>
+        function register(e){
+            event.preventDefault();
+
+            const name=event.target.fname.value;
+            const email=event.target.femail.value;
+            const password=event.target.fpassword.value;
+
+            obj={
+                name,
+                email,
+                password
+            }
+
+            axios.post("http://localhost:3000/register",obj)
+            .then(res=>{
+                res.send(res);
+            })
+        }
+
+    </script>
     
 </body>
 </html>
