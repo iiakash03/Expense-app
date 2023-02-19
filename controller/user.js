@@ -1,14 +1,18 @@
 const User=require('../models/user');
+const bcrypt=require('bcrypt');
+const { response } = require('express');
 
 exports.userRegister=(req,res,next)=>{
     const name=req.body.name;
     const email=req.body.email;
     const password=req.body.password
 
-    User.create({
-        name:name,
-        email:email,
-        password:password
+    bcrypt.hash(password,10,async(err,hash)=>{
+        console.log(err)
+    await User.create({
+        name,
+        email,
+        password:hash
     })
     .then(result=>{
         res.json(result);
@@ -16,6 +20,8 @@ exports.userRegister=(req,res,next)=>{
     .catch(err=>{
         console.log(err);
     })
+
+})
 }
 
 exports.userLogin=(req,res,next)=>{
@@ -26,13 +32,14 @@ exports.userLogin=(req,res,next)=>{
         where:{email:email}
     })
     .then((data)=>{
-        console.log(data[0].password);
         if(data.length>0){
-            if(data[0].password===password){
-                res.send('successfully authenticated');
-            }else{
-                res.send('wrong password');
-            }
+            bcrypt.compare(password,data[0].password,(err,response)=>{
+                if(response){
+                    res.send('successfully authenticated');
+                }else{
+                    res.send('wrong password');
+                }
+            })
         }else{
             res.send("User not found");
         }
