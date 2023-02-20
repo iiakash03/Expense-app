@@ -39,8 +39,9 @@
             .then(response=>{
                 console.log(response.data);
                 para.innerText=response.data;
-                if(response.data==='successfully authenticated'){
+                if(response.data.message==='successfully authenticated'){
                     window.location.href="../afterlogin.html"; 
+                    localStorage.setItem('token',response.data.token)
                 }
                        
             })

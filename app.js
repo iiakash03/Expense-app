@@ -1,8 +1,9 @@
 const userroutes=require('./routes/user');
 
+const User=require('./models/user');
+const Expense=require('./models/expenses');
+
 var cors = require('cors')
-
-
 
 const express=require('express');
 const app=express();
@@ -18,9 +19,12 @@ app.use(userroutes);
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+User.hasMany(Expense);
+Expense.hasOne(User);
+
 sequelize
+//.sync()
 .sync()
-//.sync({force:true})
 .then(result=>{
     app.listen(3000);
 })

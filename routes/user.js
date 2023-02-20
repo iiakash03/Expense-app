@@ -1,3 +1,5 @@
+const userAuthentication=require('../middleware/userauth')
+
 const userController=require('../controller/user');
 
 const express=require('express');
@@ -8,8 +10,10 @@ route.post('/register',userController.userRegister);
 
 route.post('/login',userController.userLogin);
 
-route.get('/',userController.getElements);
+route.get('/',userAuthentication.authenticate,userController.getElements);
 
-route.post('/add-expense',userController.postAddElements);
+route.post('/add-expense',userAuthentication.authenticate,userController.postAddElements);
+
+route.delete('/delete-expense/:userId',userController.deleteExpense);
 
 module.exports=route;

@@ -2,6 +2,7 @@ const User=require('../models/user');
 const expense=require('../models/expenses');
 const bcrypt=require('bcrypt');
 const express = require('express');
+const jwt=require('jsonwebtoken');
 
 exports.userRegister=(req,res,next)=>{
     const name=req.body.name;
@@ -32,18 +33,16 @@ exports.userLogin=(req,res,next)=>{
         email,
         password
     }
-    req.user=obj;
+    
     User.findAll({
-        where:{email:email}
-        
-        
+        where:{email:email}    
     })
     .then((data)=>{
-        
         if(data.length>0){
+            req.user=data
             bcrypt.compare(password,data[0].password,(err,response)=>{
                 if(response){
-                    res.send('successfully authenticated');
+                    return res.status(200).json({message:'successfully authenticated' ,token:generateAccessToken(data[0].id,data[0].name)});
                 }else{
                     res.send('wrong password');
                 }
@@ -63,17 +62,17 @@ exports.userLogin=(req,res,next)=>{
 
 exports.postAddElements=(req,res,next)=>{
 
-    console.log(req.body);
-
     const product=req.body.productname
     const price=req.body.price
     const desc=req.body.description
-    console.log(req.body);
+    console.log('request',req.user);
 
     expense.create({
         expense:product,
         price:price,
-        description:desc
+        description:desc,
+        userId:req.user.id
+        
     })
     .then((result)=>{
         res.json(result);
@@ -84,8 +83,30 @@ exports.postAddElements=(req,res,next)=>{
 }
 
 exports.getElements=(req,res,next)=>{
-    expense.findAll()
+    const userId=req.user.dataValues.id;
+    expense.findAll({
+        where:{
+            userId:userId
+        }
+    }
+    )
     .then(data=>{
         res.json(data);
     })
+}
+
+exports.deleteExpense=(req,res,next)=>{
+    const id=req.params.userId;
+    console.log(id);
+    expense.destroy({where:{id:id}})
+    .then(()=>{
+        res.sendStatus(200);
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+}
+
+function generateAccessToken(id,name){
+    return jwt.sign({userId:id,name:name},'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
 }
