@@ -4,6 +4,7 @@ const User=require('./models/user');
 const Expense=require('./models/expenses');
 const Order=require('./models/order');
 const purchaseroutes=require('./routes/purchase');
+const premiumroutes=require('./routes/premium')
 
 var cors = require('cors')
 
@@ -18,6 +19,7 @@ app.use(cors())
 
 app.use(userroutes);
 app.use('/purchase',purchaseroutes);
+app.use('/premium',premiumroutes);
 
 
 
@@ -31,8 +33,8 @@ User.hasMany(Order);
 Order.belongsTo(User);
 
 sequelize
-//.sync({force:true})
-.sync()
+.sync({force:true})
+//.sync()
 .then(result=>{
     app.listen(3000);
 })

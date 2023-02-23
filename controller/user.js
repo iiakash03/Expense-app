@@ -14,7 +14,8 @@ exports.userRegister=(req,res,next)=>{
     await User.create({
         name,
         email,
-        password:hash
+        password:hash,
+        ispremiumuser:false
     })
     .then(result=>{
         res.json(result);
@@ -42,7 +43,7 @@ exports.userLogin=(req,res,next)=>{
             req.user=data
             bcrypt.compare(password,data[0].password,(err,response)=>{
                 if(response){
-                    return res.status(200).json({message:'successfully authenticated' ,token:generateAccessToken(data[0].id,data[0].name)});
+                    return res.status(200).json({message:'successfully authenticated' ,token:generateAccessToken(data[0].id,data[0].name,data[0].ispremiumuser)});
                 }else{
                     res.send('wrong password');
                 }
@@ -107,6 +108,6 @@ exports.deleteExpense=(req,res,next)=>{
     })
 }
 
-function generateAccessToken(id,name){
-    return jwt.sign({userId:id,name:name},'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+function generateAccessToken(id,name,ispremiumuser){
+    return jwt.sign({userId:id,name:name,ispremiumuser:ispremiumuser},'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
 }
